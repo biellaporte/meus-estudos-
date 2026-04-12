@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyMind</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root {
+  --bg:#0a0c10;--bg2:#10131a;--bg3:#181c26;--bg4:#1f2333;--bg5:#262b3d;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--border3:rgba(255,255,255,0.18);
+  --text:#eceef5;--text2:#8b8fa8;--text3:#4a4e62;
+  --blue:#5b8dee;--blue2:#3d6fd4;--blue-s:rgba(91,141,238,0.13);
+  --green:#3ecf7a;--green-s:rgba(62,207,122,0.12);
+  --amber:#f5a623;--amber-s:rgba(245,166,35,0.12);
+  --red:#f06060;--red-s:rgba(240,96,96,0.12);
+  --teal:#38bdf8;--teal-s:rgba(56,189,248,0.12);
+  --purple:#a78bfa;--purple-s:rgba(167,139,250,0.12);
+  --r:10px;--r-sm:7px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;}
+body{font-family:'Mulish',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:3px;}
+
+.screen{display:none;width:100vw;height:100vh;}
+.screen.active{display:flex;}
+
+/* ── LOGIN ── */
+#screen-login{flex-direction:column;align-items:center;justify-content:center;background:var(--bg);position:relative;overflow:hidden;}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 30% 40%,rgba(91,141,238,0.08) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 75% 70%,rgba(62,207,122,0.06) 0%,transparent 60%);}
+.login-box{position:relative;z-index:1;width:100%;max-width:520px;padding:0 24px;}
+.login-logo{text-align:center;margin-bottom:44px;}
+.login-logo-title{font-family:'Syne',sans-serif;font-size:38px;font-weight:700;color:var(--text);letter-spacing:-1px;}
+.login-logo-sub{font-size:13px;color:var(--text3);margin-top:5px;}
+.login-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:26px;}
+.profiles-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.profile-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:22px 16px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;}
+.profile-card:hover{border-color:var(--blue);background:var(--bg3);transform:translateY(-2px);}
+.profile-avatar{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:700;}
+.profile-name{font-size:15px;font-weight:700;color:var(--text);}
+.profile-course{font-size:11px;color:var(--text2);text-align:center;}
+.profile-del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:3px 5px;border-radius:4px;opacity:0;transition:opacity .2s;}
+.profile-card:hover .profile-del{opacity:1;}
+.profile-del:hover{color:var(--red);background:var(--red-s);}
+.btn-new-profile{width:100%;padding:12px;border:1px dashed var(--border2);border-radius:var(--r);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'Mulish',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-new-profile:hover{border-color:var(--blue);color:var(--blue);}
+
+/* ── APP ── */
+#screen-app{flex-direction:row;}
+.sidebar{width:228px;min-width:228px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0;}
+.sidebar-top{padding:16px 14px 12px;border-bottom:1px solid var(--border);}
+.sidebar-user{display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px 8px;border-radius:var(--r-sm);transition:background .15s;}
+.sidebar-user:hover{background:var(--bg3);}
+.sidebar-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.sidebar-username{font-size:13px;font-weight:700;color:var(--text);}
+.sidebar-course{font-size:11px;color:var(--text2);}
+.nav-group{padding:10px 10px 4px;}
+.nav-group-label{font-size:10px;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;padding:0 6px;margin-bottom:4px;}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:13px;color:var(--text2);border:none;background:transparent;width:100%;text-align:left;transition:all .15s;font-family:'Mulish',sans-serif;}
+.nav-btn:hover{background:var(--bg3);color:var(--text);}
+.nav-btn.active{background:var(--blue-s);color:var(--blue);font-weight:600;}
+.nav-ico{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;font-size:10px;background:var(--red-s);color:var(--red);padding:1px 6px;border-radius:99px;font-weight:700;}
+.subjects-section{flex:1;overflow-y:auto;padding:10px 10px 4px;}
+.subj-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:12.5px;color:var(--text2);transition:all .15s;group:true;}
+.subj-item:hover{background:var(--bg3);color:var(--text);}
+.subj-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.subj-del{margin-left:auto;background:none;border:none;color:transparent;cursor:pointer;font-size:12px;padding:1px 4px;border-radius:3px;transition:all .15s;}
+.subj-item:hover .subj-del{color:var(--text3);}
+.subj-del:hover{color:var(--red)!important;background:var(--red-s);}
+.btn-add-subj{margin:6px 10px;padding:7px 10px;border:1px dashed var(--border2);border-radius:var(--r-sm);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;width:calc(100% - 20px);display:flex;align-items:center;gap:7px;transition:all .15s;font-family:'Mulish',sans-serif;}
+.btn-add-subj:hover{border-color:var(--blue);color:var(--blue);}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{height:52px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--bg2);flex-shrink:0;}
+.topbar-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:var(--text);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.api-chip{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:11.5px;cursor:pointer;transition:all .15s;font-family:'Mulish',sans-serif;}
+.api-chip:hover{border-color:var(--blue);color:var(--blue);}
+.api-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:background .3s;}
+.api-dot.ok{background:var(--green);box-shadow:0 0 5px var(--green);}
+.help-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:11.5px;cursor:pointer;transition:all .15s;font-family:'Mulish',sans-serif;}
+.help-btn:hover{border-color:var(--amber);color:var(--amber);}
+
+.content{flex:1;overflow-y:auto;padding:22px;}
+.panel{display:none;animation:fadeUp .18s ease;}
+.panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── TOUR BALLOON ── */
+.tour-overlay{position:fixed;inset:0;z-index:500;pointer-events:none;}
+.tour-overlay.blocking{pointer-events:all;background:rgba(0,0,0,0.6);}
+.tour-balloon{
+  position:fixed;z-index:600;background:var(--bg2);border:1px solid var(--blue);
+  border-radius:var(--r);padding:18px 20px;max-width:300px;min-width:240px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.5);animation:balloonIn .25s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:all;
+}
+@keyframes balloonIn{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
+.tour-balloon::before{content:'';position:absolute;width:12px;height:12px;background:var(--bg2);border:1px solid var(--blue);transform:rotate(45deg);}
+.tour-balloon.arrow-left::before{left:-7px;top:50%;margin-top:-6px;border-right:none;border-top:none;}
+.tour-balloon.arrow-top::before{top:-7px;left:24px;border-right:none;border-bottom:none;}
+.tour-balloon.arrow-bottom::before{bottom:-7px;left:24px;border-left:none;border-top:none;}
+.tour-step{font-size:10px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+.tour-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.tour-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:14px;}
+.tour-actions{display:flex;gap:8px;align-items:center;}
+.tour-skip{font-size:12px;color:var(--text3);cursor:pointer;background:none;border:none;font-family:'Mulish',sans-serif;transition:color .15s;}
+.tour-skip:hover{color:var(--text2);}
+.tour-dots{display:flex;gap:5px;margin-left:auto;}
+.tour-dot{width:6px;height:6px;border-radius:50%;background:var(--bg5);}
+.tour-dot.active{background:var(--blue);}
+.tour-highlight{position:fixed;z-index:490;border-radius:var(--r);box-shadow:0 0 0 4px var(--blue),0 0 0 9999px rgba(0,0,0,0.55);pointer-events:none;transition:all .3s ease;}
+
+/* ── COMPONENTS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.card-title{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.card-title .ico{color:var(--blue);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
+.metric{background:var(--bg3);border-radius:var(--r);padding:14px 16px;border:1px solid var(--border);}
+.metric-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.metric-val{font-family:'Syne',sans-serif;font-size:30px;font-weight:700;color:var(--text);}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;}
+input,textarea,select{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'Mulish',sans-serif;font-size:13.5px;padding:9px 12px;width:100%;transition:border-color .15s;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);}
+input::placeholder,textarea::placeholder{color:var(--text3);}
+select option{background:var(--bg3);}
+textarea{resize:vertical;min-height:80px;line-height:1.6;}
+.btn{padding:9px 16px;border-radius:var(--r-sm);font-size:13px;font-family:'Mulish',sans-serif;font-weight:600;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover{background:var(--blue2);transform:translateY(-1px);}
+.btn-primary:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed;transform:none;}
+.btn-ghost{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
+.btn-red{background:var(--red-s);border:1px solid transparent;color:var(--red);}
+.frow{margin-bottom:11px;}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px;}
+.ai-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--blue);background:var(--blue-s);padding:2px 9px;border-radius:99px;margin-bottom:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.ai-out{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;font-size:13.5px;line-height:1.8;color:var(--text2);white-space:pre-wrap;min-height:60px;}
+.dots{display:inline-flex;gap:4px;align-items:center;padding:6px 0;}
+.dots span{width:5px;height:5px;border-radius:50%;background:var(--blue);animation:blink 1.2s infinite;}
+.dots span:nth-child(2){animation-delay:.2s;}
+.dots span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.2;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:600;}
+.chip-blue{background:var(--blue-s);color:var(--blue);}
+.chip-green{background:var(--green-s);color:var(--green);}
+.chip-amber{background:var(--amber-s);color:var(--amber);}
+.chip-red{background:var(--red-s);color:var(--red);}
+.ev-item{display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(--bg3);border-radius:var(--r-sm);border:1px solid var(--border);transition:border-color .15s;margin-bottom:7px;}
+.ev-item:hover{border-color:var(--border2);}
+.ev-ico{width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ev-info{flex:1;}
+.ev-title{font-size:13px;font-weight:600;color:var(--text);}
+.ev-sub{font-size:11.5px;color:var(--text3);margin-top:1px;}
+.ev-date{font-family:'Syne',sans-serif;font-size:12px;color:var(--text2);text-align:right;white-space:nowrap;}
+.ev-del{background:none;border:none;color:var(--text3);cursor:pointer;padding:3px 6px;border-radius:4px;font-size:15px;transition:all .15s;}
+.ev-del:hover{color:var(--red);background:var(--red-s);}
+.pbar{height:4px;background:var(--bg4);border-radius:99px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:99px;background:var(--blue);transition:width .4s;}
+.tab-row{display:flex;gap:3px;background:var(--bg3);padding:3px;border-radius:var(--r-sm);margin-bottom:14px;}
+.tab{flex:1;padding:7px;font-size:12.5px;cursor:pointer;border-radius:6px;text-align:center;color:var(--text2);border:none;background:transparent;transition:all .15s;font-family:'Mulish',sans-serif;font-weight:500;}
+.tab.active{background:var(--bg2);color:var(--text);font-weight:600;}
+.empty{text-align:center;padding:36px 16px;color:var(--text3);font-size:13px;}
+.empty-ico{font-size:30px;margin-bottom:9px;opacity:.3;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.sec-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.sec-sub{font-size:13px;color:var(--text3);font-family:'Mulish',sans-serif;font-weight:400;}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r);padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px;background:var(--bg3);position:relative;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--blue);background:var(--blue-s);}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-ico{font-size:28px;margin-bottom:8px;}
+.upload-txt{font-size:13px;color:var(--text2);}
+.upload-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.file-attached{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);margin-bottom:10px;}
+.file-ico{font-size:18px;}
+.file-name{font-size:13px;color:var(--text);flex:1;}
+.file-size{font-size:11px;color:var(--text3);}
+.file-rm{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 5px;}
+.file-rm:hover{color:var(--red);}
+.fc-scene{perspective:1200px;width:100%;height:200px;cursor:pointer;margin-bottom:12px;}
+.fc-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);}
+.fc-inner.flipped{transform:rotateY(180deg);}
+.fc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;border:1px solid var(--border);}
+.fc-front{background:var(--bg3);}
+.fc-back{background:var(--bg3);transform:rotateY(180deg);border-color:var(--blue);}
+.fc-hint{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.fc-text{font-family:'Syne',sans-serif;font-size:17px;color:var(--text);line-height:1.4;}
+.fc-nav{display:flex;align-items:center;gap:10px;justify-content:center;}
+.fc-ctr{font-size:12px;color:var(--text3);}
+.sr-btn{flex:1;padding:8px;border-radius:var(--r-sm);font-size:12.5px;cursor:pointer;border:none;font-family:'Mulish',sans-serif;font-weight:600;transition:all .15s;}
+.sr-easy{background:var(--green-s);color:var(--green);}
+.sr-easy:hover{background:var(--green);color:#061a0f;}
+.sr-med{background:var(--amber-s);color:var(--amber);}
+.sr-med:hover{background:var(--amber);color:#1a0e00;}
+.sr-hard{background:var(--red-s);color:var(--red);}
+.sr-hard:hover{background:var(--red);color:#1a0000;}
+.quiz-q{font-family:'Syne',sans-serif;font-size:17px;color:var(--text);line-height:1.5;margin-bottom:16px;}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;}
+.quiz-opt{padding:11px 15px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);cursor:pointer;font-size:13.5px;color:var(--text2);transition:all .15s;text-align:left;font-family:'Mulish',sans-serif;}
+.quiz-opt:hover:not(:disabled){border-color:var(--blue);color:var(--blue);background:var(--blue-s);}
+.quiz-opt.correct{background:var(--green-s);border-color:var(--green);color:var(--green);}
+.quiz-opt.wrong{background:var(--red-s);border-color:var(--red);color:var(--red);}
+.quiz-opt:disabled{cursor:default;}
+.quiz-fb{margin-top:12px;padding:12px 14px;border-radius:var(--r-sm);font-size:13.5px;line-height:1.65;}
+.fb-ok{background:var(--green-s);color:#7eeaaa;border:1px solid rgba(62,207,122,.18);}
+.fb-err{background:var(--red-s);color:#f8a0a0;border:1px solid rgba(240,96,96,.18);}
+.pomo-time{font-family:'Syne',sans-serif;font-size:78px;font-weight:700;color:var(--text);text-align:center;letter-spacing:-3px;padding:14px 0;line-height:1;}
+.pomo-lbl{text-align:center;font-size:13px;color:var(--text3);margin-bottom:18px;}
+.pomo-ctrl{display:flex;gap:10px;justify-content:center;margin-bottom:18px;}
+.pomo-prog{height:4px;background:var(--bg4);border-radius:99px;overflow:hidden;margin-bottom:8px;}
+.pomo-bar{height:100%;background:var(--blue);border-radius:99px;transition:width 1s linear;}
+.pomo-dots{display:flex;gap:6px;justify-content:center;margin-top:10px;}
+.pomo-dot{width:9px;height:9px;border-radius:50%;background:var(--bg4);transition:background .3s;}
+.pomo-dot.done{background:var(--blue);}
+.pomo-dot.now{background:var(--green);box-shadow:0 0 7px var(--green);}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(5px);}
+.overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:24px;width:460px;max-width:95vw;animation:fadeUp .18s ease;}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--text);margin-bottom:16px;}
+.modal-actions{display:flex;gap:9px;margin-top:18px;}
+
+/* ── GUIDE BOX ── */
+.guide-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:16px;margin-bottom:14px;}
+.guide-box-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.guide-step{display:flex;gap:10px;margin-bottom:9px;align-items:flex-start;}
+.guide-num{width:22px;height:22px;border-radius:50%;background:var(--blue-s);color:var(--blue);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.guide-text{font-size:13px;color:var(--text2);line-height:1.6;}
+.guide-text strong{color:var(--text);}
+.guide-text a{color:var(--blue);text-decoration:none;}
+.guide-text a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="screen-login">
+  <div class="login-bg"></div>
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-title">StudyMind</div>
+      <div class="login-logo-sub">Seu assistente de aprendizado com IA</div>
+    </div>
+    <div class="login-title">Quem vai estudar?</div>
+    <div class="login-sub">Selecione seu perfil para continuar</div>
+    <div class="profiles-grid" id="profiles-grid"></div>
+    <button class="btn-new-profile" onclick="openNewProfile()">+ Criar novo perfil</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="screen" id="screen-app">
+  <div class="sidebar" id="sidebar-el">
+    <div class="sidebar-top">
+      <div class="sidebar-user" onclick="goLogin()" title="Trocar perfil">
+        <div class="sidebar-avatar" id="sb-av"></div>
+        <div style="flex:1;min-width:0;">
+          <div class="sidebar-username" id="sb-name"></div>
+          <div class="sidebar-course" id="sb-course"></div>
+        </div>
+        <span style="font-size:11px;color:var(--text3);" title="Trocar">⇄</span>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Principal</div>
+      <button class="nav-btn active" id="nav-dashboard" onclick="goPage('dashboard',this)"><span class="nav-ico">◈</span>Dashboard</button>
+      <button class="nav-btn" id="nav-aula" onclick="goPage('aula',this)"><span class="nav-ico">🎓</span>Aula com IA</button>
+      <button class="nav-btn" id="nav-plano" onclick="goPage('plano',this)"><span class="nav-ico">◻</span>Plano de Estudos</button>
+      <button class="nav-btn" id="nav-eventos" onclick="goPage('eventos',this)"><span class="nav-ico">◷</span>Provas & Tarefas<span class="nav-badge" id="nb-events">0</span></button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Aprender & Fixar</div>
+      <button class="nav-btn" id="nav-flashcards" onclick="goPage('flashcards',this)"><span class="nav-ico">⬡</span>Flashcards</button>
+      <button class="nav-btn" id="nav-quiz" onclick="goPage('quiz',this)"><span class="nav-ico">◎</span>Quiz com IA</button>
+      <button class="nav-btn" id="nav-repeticao" onclick="goPage('repeticao',this)"><span class="nav-ico">↻</span>Repetição Espaçada</button>
+      <button class="nav-btn" id="nav-pomodoro" onclick="goPage('pomodoro',this)"><span class="nav-ico">◉</span>Pomodoro</button>
+    </div>
+
+    <div class="subjects-section" id="subj-section-el">
+      <div class="nav-group-label">Minhas Matérias</div>
+      <div id="sb-subjects"></div>
+      <button class="btn-add-subj" id="add-subj-btn" onclick="openAddSubj()">+ Nova matéria</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="topbar-title">Dashboard</span>
+      <div class="topbar-right">
+        <button class="help-btn" onclick="startTour()">❓ Tour guiado</button>
+        <div class="api-chip" id="api-chip-el" onclick="openApiModal()">
+          <div class="api-dot" id="api-dot"></div>
+          API Gemini
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="sec-title">Olá, <span id="dash-name">Estudante</span>! 👋
+          <span class="sec-sub" id="dash-date"></span>
+        </div>
+        <div class="g3">
+          <div class="metric"><div class="metric-lbl">Matérias</div><div class="metric-val" id="dm-subj">0</div><div class="metric-sub">ativas</div></div>
+          <div class="metric"><div class="metric-lbl">Próximas provas</div><div class="metric-val" id="dm-provas">0</div><div class="metric-sub">nos próximos 30 dias</div></div>
+          <div class="metric"><div class="metric-lbl">Para revisar</div><div class="metric-val" id="dm-cards">0</div><div class="metric-sub">flashcards hoje</div></div>
+        </div>
+        <div class="card" id="dash-chat-card">
+          <div class="card-title"><span class="ico">✦</span>Assistente de estudos</div>
+          <div style="display:flex;gap:9px;margin-bottom:11px;">
+            <input id="dash-q" placeholder="Pergunte qualquer coisa sobre seus estudos..." onkeydown="if(event.key==='Enter')dashAsk()" style="flex:1;">
+            <button class="btn btn-primary" id="dash-btn" onclick="dashAsk()">Perguntar</button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+            <button class="btn btn-ghost" style="font-size:11.5px;padding:4px 11px;" onclick="quickAsk('Como usar a técnica de Feynman para estudar melhor?')">🧠 Técnica Feynman</button>
+            <button class="btn btn-ghost" style="font-size:11.5px;padding:4px 11px;" onclick="quickAsk('Como gerenciar o tempo na faculdade equilibrando todas as matérias?')">⏰ Gestão do tempo</button>
+            <button class="btn btn-ghost" style="font-size:11.5px;padding:4px 11px;" onclick="quickAsk('Dicas para não travar na hora da prova e controlar a ansiedade')">💆 Ansiedade em prova</button>
+            <button class="btn btn-ghost" style="font-size:11.5px;padding:4px 11px;" onclick="quickAsk('Qual é a melhor forma de fazer anotações durante as aulas?')">📝 Anotações</button>
+          </div>
+          <div id="dash-out" style="display:none;">
+            <div class="ai-tag">✦ StudyMind IA</div>
+            <div class="ai-out" id="dash-out-txt"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="ico">◷</span>Próximos eventos</div>
+          <div id="dash-events"></div>
+        </div>
+      </div>
+
+      <!-- AULA COM IA -->
+      <div class="panel" id="panel-aula">
+        <div class="sec-title">🎓 Aula com IA</div>
+        <div class="g2" style="align-items:start;">
+          <div>
+            <div class="card">
+              <div class="card-title"><span class="ico">📎</span>Anexar material do professor</div>
+              <div class="upload-zone" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="dropFile(event)">
+                <input type="file" id="file-input" accept=".pdf,.txt,.md,.docx,image/*" onchange="handleFile(event)">
+                <div class="upload-ico">📂</div>
+                <div class="upload-txt">Arraste ou clique para selecionar</div>
+                <div class="upload-sub">PDF · Foto do slide/quadro · TXT · DOCX</div>
+              </div>
+              <div id="file-preview"></div>
+              <div class="frow"><label>Matéria</label><select id="aula-subj"></select></div>
+              <div class="frow">
+                <label>O que a IA deve fazer?</label>
+                <select id="aula-action">
+                  <option value="aula">🎓 Reexplicar como aula didática completa</option>
+                  <option value="resumo">📋 Resumo inteligente com pontos-chave</option>
+                  <option value="mapa">🗺️ Mapa mental hierárquico</option>
+                  <option value="flashcards">⬡ Gerar flashcards para memorização</option>
+                  <option value="quiz">◎ Gerar quiz de fixação</option>
+                  <option value="prova">📝 Simular questões de prova</option>
+                </select>
+              </div>
+              <div class="frow">
+                <label>Observações extras (opcional)</label>
+                <textarea id="aula-extra" style="min-height:60px;" placeholder="Ex: tenho dificuldade com equações diferenciais, a prova é em 2 semanas..."></textarea>
+              </div>
+              <button class="btn btn-primary" id="aula-btn" onclick="processAula()" style="width:100%;justify-content:center;">✦ Processar com IA</button>
+            </div>
+          </div>
+          <div id="aula-result-area">
+            <div class="empty"><div class="empty-ico">🎓</div>Anexe um material e a IA vai transformar em uma experiência de aprendizado completa</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANO -->
+      <div class="panel" id="panel-plano">
+        <div class="sec-title">Plano de Estudos</div>
+        <div class="g2" style="align-items:start;">
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-title"><span class="ico">✦</span>Gerar plano personalizado</div>
+            <div class="frow"><label>Matéria</label><select id="plan-subj"></select></div>
+            <div class="fg2">
+              <div><label>Horas/semana</label><input type="number" id="plan-h" value="8" min="1" max="60"></div>
+              <div><label>Semanas até a prova</label><input type="number" id="plan-w" value="3" min="1" max="20"></div>
+            </div>
+            <div class="frow"><label>Nível atual</label>
+              <select id="plan-lvl">
+                <option value="zero">Nunca vi o conteúdo</option>
+                <option value="basico" selected>Vi pouco, base fraca</option>
+                <option value="medio">Entendo metade</option>
+                <option value="bom">Entendo bem, preciso revisar</option>
+              </select>
+            </div>
+            <div class="frow"><label>Meta</label>
+              <select id="plan-meta">
+                <option value="passar">Passar com nota mínima</option>
+                <option value="bem">Nota boa (7+)</option>
+                <option value="excelente">Dominar o conteúdo (9+)</option>
+              </select>
+            </div>
+            <div class="frow"><label>Dificuldades específicas</label>
+              <textarea id="plan-dif" style="min-height:70px;" placeholder="Ex: odeio cálculo mas sou bom em álgebra, tenho 2h livres por dia..."></textarea>
+            </div>
+            <button class="btn btn-primary" id="plan-btn" onclick="genPlan()" style="width:100%;justify-content:center;">✦ Gerar plano completo</button>
+          </div>
+          <div>
+            <div id="plan-out" style="display:none;">
+              <div class="ai-tag">✦ Plano gerado</div>
+              <div class="ai-out" id="plan-txt" style="min-height:320px;"></div>
+              <div style="display:flex;gap:8px;margin-top:9px;">
+                <button class="btn btn-ghost" onclick="copyEl('plan-txt')">📋 Copiar</button>
+                <button class="btn btn-ghost" onclick="genPlan()">↺ Regenerar</button>
+              </div>
+            </div>
+            <div id="plan-empty" class="empty"><div class="empty-ico">◻</div>Preencha e gere seu plano personalizado</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENTOS -->
+      <div class="panel" id="panel-eventos">
+        <div class="sec-title">Provas & Tarefas</div>
+        <div class="g2" style="align-items:start;">
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-title"><span class="ico">+</span>Novo evento</div>
+            <div class="fg2">
+              <div><label>Tipo</label>
+                <select id="ev-type">
+                  <option value="prova">📋 Prova</option>
+                  <option value="ativ">📝 Atividade/Lista</option>
+                  <option value="revisao">🔄 Revisão</option>
+                  <option value="trabalho">📁 Trabalho</option>
+                </select>
+              </div>
+              <div><label>Matéria</label><select id="ev-subj"></select></div>
+            </div>
+            <div class="frow"><label>Descrição</label><input id="ev-desc" placeholder="Ex: P2 — capítulos 5-8..."></div>
+            <div class="fg2">
+              <div><label>Data</label><input type="date" id="ev-date"></div>
+              <div><label>Horário</label><input type="time" id="ev-time"></div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost" onclick="addEvent()" style="flex:1;justify-content:center;">Salvar</button>
+              <button class="btn btn-primary" id="ev-prep-btn" onclick="eventPrep()" style="flex:1;justify-content:center;">✦ Plano de preparo</button>
+            </div>
+            <div id="ev-out" style="display:none;margin-top:12px;">
+              <div class="ai-tag">✦ Plano de preparação</div>
+              <div class="ai-out" id="ev-txt"></div>
+            </div>
+          </div>
+          <div>
+            <div class="card-title" style="margin-bottom:11px;"><span class="ico">◷</span>Todos os eventos</div>
+            <div id="all-events"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLASHCARDS -->
+      <div class="panel" id="panel-flashcards">
+        <div class="sec-title">Flashcards</div>
+        <div class="g2" style="align-items:start;">
+          <div id="fc-main-area"></div>
+          <div>
+            <div class="card">
+              <div class="card-title"><span class="ico">+</span>Novo flashcard</div>
+              <div class="frow"><label>Matéria</label><select id="fc-subj"></select></div>
+              <div class="frow"><label>Pergunta (frente)</label><textarea id="fc-q" style="min-height:65px;" placeholder="Ex: O que é momento de inércia?"></textarea></div>
+              <div class="frow"><label>Resposta (verso)</label><textarea id="fc-a" style="min-height:65px;" placeholder="Ex: Resistência do corpo à variação da rotação..."></textarea></div>
+              <button class="btn btn-primary" onclick="addFC()" style="width:100%;justify-content:center;">Adicionar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="panel" id="panel-quiz">
+        <div class="sec-title">Quiz com IA</div>
+        <div class="g2" style="align-items:start;">
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-title"><span class="ico">✦</span>Configurar</div>
+            <div class="frow"><label>Matéria</label><select id="quiz-subj"></select></div>
+            <div class="frow"><label>Tópico (opcional)</label><input id="quiz-topic" placeholder="Ex: Segunda Lei de Newton..."></div>
+            <div class="fg2">
+              <div><label>Questões</label>
+                <select id="quiz-qty"><option value="3">3</option><option value="5" selected>5</option><option value="8">8</option><option value="10">10</option></select>
+              </div>
+              <div><label>Dificuldade</label>
+                <select id="quiz-dif"><option value="facil">Fácil</option><option value="medio" selected>Médio</option><option value="dificil">Difícil</option><option value="misto">Misto</option></select>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="quiz-gen-btn" onclick="genQuiz()" style="width:100%;justify-content:center;">✦ Gerar quiz</button>
+          </div>
+          <div id="quiz-area"><div class="empty"><div class="empty-ico">◎</div>Configure e gere um quiz</div></div>
+        </div>
+      </div>
+
+      <!-- REPETIÇÃO -->
+      <div class="panel" id="panel-repeticao">
+        <div class="sec-title">Repetição Espaçada <span class="sec-sub">— SM-2</span></div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-title"><span class="ico">↻</span>Como funciona</div>
+          <p style="font-size:13.5px;color:var(--text2);line-height:1.75;">Cada flashcard é revisado <strong style="color:var(--text);">no momento exato em que você está prestes a esquecer</strong>. Avalie sua resposta e o algoritmo ajusta o intervalo automaticamente.</p>
+        </div>
+        <div id="sr-list"></div>
+      </div>
+
+      <!-- POMODORO -->
+      <div class="panel" id="panel-pomodoro">
+        <div class="sec-title">Pomodoro Timer</div>
+        <div class="g2">
+          <div class="card">
+            <div class="pomo-time" id="pomo-time">25:00</div>
+            <div class="pomo-lbl" id="pomo-lbl">Sessão de foco</div>
+            <div class="pomo-prog"><div class="pomo-bar" id="pomo-bar" style="width:100%"></div></div>
+            <div class="pomo-dots" id="pomo-dots"></div>
+            <div class="pomo-ctrl" style="margin-top:14px;">
+              <button class="btn btn-ghost" onclick="pomoReset()">↺</button>
+              <button class="btn btn-primary" id="pomo-btn" onclick="pomoToggle()" style="min-width:110px;justify-content:center;">▶ Iniciar</button>
+              <button class="btn btn-ghost" onclick="pomoSkip()">⏭</button>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:12px;">
+              <div class="card-title"><span class="ico">◎</span>Configurar</div>
+              <div class="fg2">
+                <div class="frow"><label>Foco (min)</label><input type="number" id="p-focus" value="25" min="5" max="90" onchange="pomoConfig()"></div>
+                <div class="frow"><label>Pausa curta</label><input type="number" id="p-short" value="5" min="1" max="30" onchange="pomoConfig()"></div>
+              </div>
+              <div class="fg2">
+                <div class="frow"><label>Pausa longa</label><input type="number" id="p-long" value="15" min="5" max="60" onchange="pomoConfig()"></div>
+                <div class="frow"><label>Sessões/ciclo</label><input type="number" id="p-sess" value="4" min="2" max="8" onchange="pomoConfig()"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="ico">◈</span>Hoje</div>
+              <div id="pomo-log" style="font-size:13px;color:var(--text3);">Nenhuma sessão ainda</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="modal-api">
+  <div class="modal">
+    <div class="modal-title">🔑 API Key — Google Gemini (gratuito)</div>
+
+    <div class="guide-box" style="margin-bottom:14px;">
+      <div class="guide-box-title">📋 Como obter sua chave grátis:</div>
+      <div class="guide-step"><div class="guide-num">1</div><div class="guide-text">Acesse <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a></div></div>
+      <div class="guide-step"><div class="guide-num">2</div><div class="guide-text">Faça login com sua <strong>conta Google</strong></div></div>
+      <div class="guide-step"><div class="guide-num">3</div><div class="guide-text">Clique em <strong>"Get API Key"</strong> → <strong>"Create API Key"</strong></div></div>
+      <div class="guide-step"><div class="guide-num">4</div><div class="guide-text">Copie e cole a chave abaixo. É <strong>100% grátis</strong>!</div></div>
+    </div>
+
+    <div class="frow"><label>Sua API Key</label><input type="password" id="api-key-in" placeholder="AIzaSy..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-api')" style="flex:1;justify-content:center;">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveApi()" style="flex:1;justify-content:center;">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-profile">
+  <div class="modal">
+    <div class="modal-title">+ Novo perfil</div>
+    <div class="frow"><label>Seu nome</label><input id="np-name" placeholder="Ex: Gabriel, Adriely..."></div>
+    <div class="frow"><label>Curso</label><input id="np-course" placeholder="Ex: Engenharia Mecânica, Ciências Contábeis..."></div>
+    <div class="frow"><label>Cor do perfil</label>
+      <select id="np-color">
+        <option value="#5b8dee">🔵 Azul</option>
+        <option value="#3ecf7a">🟢 Verde</option>
+        <option value="#f5a623">🟡 Âmbar</option>
+        <option value="#f06060">🔴 Vermelho</option>
+        <option value="#38bdf8">🩵 Teal</option>
+        <option value="#a78bfa">🟣 Roxo</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-profile')" style="flex:1;justify-content:center;">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProfile()" style="flex:1;justify-content:center;">Criar perfil</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-subj">
+  <div class="modal">
+    <div class="modal-title">+ Nova matéria</div>
+    <div class="frow"><label>Nome da matéria</label><input id="sj-name" placeholder="Ex: Resistência dos Materiais, Contabilidade Geral..."></div>
+    <div class="fg2">
+      <div><label>Semestre</label><input id="sj-sem" placeholder="Ex: 1/2025"></div>
+      <div><label>Cor</label>
+        <select id="sj-color">
+          <option value="#5b8dee">🔵 Azul</option>
+          <option value="#3ecf7a">🟢 Verde</option>
+          <option value="#f5a623">🟡 Âmbar</option>
+          <option value="#f06060">🔴 Vermelho</option>
+          <option value="#38bdf8">🩵 Teal</option>
+          <option value="#a78bfa">🟣 Roxo</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow"><label>Professor / notas (opcional)</label><textarea id="sj-notes" style="min-height:55px;" placeholder="Anotações sobre a matéria..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-subj')" style="flex:1;justify-content:center;">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSubj()" style="flex:1;justify-content:center;">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOUR -->
+<div class="tour-overlay" id="tour-overlay"></div>
+<div class="tour-highlight" id="tour-highlight" style="display:none;"></div>
+<div class="tour-balloon" id="tour-balloon" style="display:none;"></div>
+
+<script>
+// ═══ STORAGE ═══
+const LS={g:k=>{try{return JSON.parse(localStorage.getItem('sm_'+k))}catch{return null}},s:(k,v)=>localStorage.setItem('sm_'+k,JSON.stringify(v))};
+
+// ═══ STATE ═══
+let profiles=LS.g('profiles')||[];
+let currentUser=null;
+let apiKey='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';
+let subjects=[],events=[],flashcards=[];
+let pendingQuiz=[],pendingFCs=[];
+let currentFile=null;
+const ud={g:k=>LS.g(`u_${currentUser.id}_${k}`),s:(k,v)=>LS.s(`u_${currentUser.id}_${k}`,v)};
+
+// Pomodoro
+const pomo={running:false,iv:null,rem:25*60,tot:25*60,mode:'focus',sess:0,doneToday:0,focusM:25,shortM:5,longM:15,sessN:4};
+
+// ═══ TOUR STEPS ═══
+const tourSteps=[
+  {target:'#sidebar-el',title:'Barra lateral',desc:'Aqui ficam todas as seções do app. Clique em qualquer item para navegar entre as ferramentas de estudo.',pos:'right'},
+  {target:'#nav-aula',title:'🎓 Aula com IA',desc:'A função principal! Anexe o PDF ou foto do slide do professor e a IA reexplica o conteúdo como uma aula completa, cria resumos, flashcards e quiz automaticamente.',pos:'right'},
+  {target:'#nav-plano',title:'◻ Plano de Estudos',desc:'Diga sua matéria, horas disponíveis e nível. A IA monta um cronograma semanal detalhado com técnicas de estudo personalizadas.',pos:'right'},
+  {target:'#nav-eventos',title:'◷ Provas & Tarefas',desc:'Cadastre suas provas e atividades com data. A IA cria um plano de preparo específico pra cada uma, com cronograma e estratégias.',pos:'right'},
+  {target:'#nav-flashcards',title:'⬡ Flashcards',desc:'Crie cartões de estudo manualmente ou gere automaticamente via "Aula com IA". Clique no cartão para virar e ver a resposta.',pos:'right'},
+  {target:'#nav-quiz',title:'◎ Quiz com IA',desc:'Gere questões de múltipla escolha personalizadas por matéria e dificuldade. A IA explica cada resposta com detalhes didáticos.',pos:'right'},
+  {target:'#nav-repeticao',title:'↻ Repetição Espaçada',desc:'Algoritmo científico SM-2: cada flashcard aparece no momento exato em que você está prestes a esquecer. Maximiza a retenção com mínimo esforço.',pos:'right'},
+  {target:'#nav-pomodoro',title:'◉ Pomodoro',desc:'Timer de foco + pausas. Estude em blocos de 25 min e descanse 5 min. Clinicamente comprovado para aumentar a produtividade.',pos:'right'},
+  {target:'#subj-section-el',title:'Suas Matérias',desc:'Adicione suas matérias do semestre aqui. Cada matéria tem sua cor. Para excluir uma matéria que acabou, passe o mouse sobre ela e clique no ✕ que aparece ao lado.',pos:'right'},
+  {target:'#api-chip-el',title:'🔑 API Gemini (grátis)',desc:'Configure aqui sua chave da API do Google Gemini para ativar toda a IA do app. É gratuito! Basta ter conta Google e acessar aistudio.google.com.',pos:'bottom'},
+];
+
+let tourIdx=0;
+
+function startTour(){
+  tourIdx=0;
+  document.getElementById('tour-overlay').classList.add('blocking');
+  showTourStep();
+}
+
+function showTourStep(){
+  const step=tourSteps[tourIdx];
+  const target=document.querySelector(step.target);
+  const balloon=document.getElementById('tour-balloon');
+  const highlight=document.getElementById('tour-highlight');
+
+  if(!target){nextTourStep();return;}
+
+  const rect=target.getBoundingClientRect();
+  // highlight
+  highlight.style.display='block';
+  highlight.style.left=(rect.left-6)+'px';
+  highlight.style.top=(rect.top-6)+'px';
+  highlight.style.width=(rect.width+12)+'px';
+  highlight.style.height=(rect.height+12)+'px';
+
+  // dots
+  const dotsHtml=tourSteps.map((_,i)=>`<div class="tour-dot${i===tourIdx?' active':''}"></div>`).join('');
+
+  balloon.innerHTML=`
+    <div class="tour-step">Passo ${tourIdx+1} de ${tourSteps.length}</div>
+    <div class="tour-title">${step.title}</div>
+    <div class="tour-desc">${step.desc}</div>
+    <div class="tour-actions">
+      <button class="tour-skip" onclick="endTour()">Pular tour</button>
+      <div class="tour-dots">${dotsHtml}</div>
+      ${tourIdx>0?`<button class="btn btn-ghost" style="padding:5px 12px;font-size:12px;" onclick="prevTourStep()">← Voltar</button>`:''}
+      <button class="btn btn-primary" style="padding:6px 14px;font-size:12.5px;" onclick="nextTourStep()">${tourIdx===tourSteps.length-1?'✓ Concluir':'Próximo →'}</button>
+    </div>`;
+
+  balloon.className='tour-balloon';
+  balloon.style.display='block';
+
+  // position balloon
+  const bw=300,bh=200;
+  if(step.pos==='right'){
+    balloon.style.left=(rect.right+18)+'px';
+    balloon.style.top=Math.max(10,rect.top)+'px';
+    balloon.classList.add('arrow-left');
+  } else if(step.pos==='bottom'){
+    balloon.style.left=Math.max(10,rect.left)+'px';
+    balloon.style.top=(rect.bottom+14)+'px';
+    balloon.classList.add('arrow-top');
+  }
+
+  // clamp to viewport
+  const bRect=balloon.getBoundingClientRect();
+  if(bRect.right>window.innerWidth-10) balloon.style.left=(window.innerWidth-bw-10)+'px';
+  if(bRect.bottom>window.innerHeight-10) balloon.style.top=(window.innerHeight-bh-10)+'px';
+}
+
+function nextTourStep(){
+  tourIdx++;
+  if(tourIdx>=tourSteps.length){endTour();return;}
+  showTourStep();
+}
+function prevTourStep(){
+  tourIdx=Math.max(0,tourIdx-1);
+  showTourStep();
+}
+function endTour(){
+  document.getElementById('tour-overlay').classList.remove('blocking');
+  document.getElementById('tour-balloon').style.display='none';
+  document.getElementById('tour-highlight').style.display='none';
+  LS.s('tourDone_'+currentUser?.id,'1');
+}
+
+// ═══ INIT ═══
+function init(){
+  updateApiDot();
+  if(!profiles.length){
+    profiles=[
+      {id:'gabriel',name:'Gabriel',course:'Engenharia Mecânica',color:'#5b8dee'},
+      {id:'adriely',name:'Adriely',course:'Ciências Contábeis',color:'#3ecf7a'},
+    ];
+    LS.s('profiles',profiles);
+  }
+  renderLoginProfiles();
+  if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// ═══ LOGIN ═══
+function renderLoginProfiles(){
+  const grid=document.getElementById('profiles-grid');
+  if(!profiles.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text3);font-size:13px;">Nenhum perfil. Crie o primeiro!</div>`;return;}
+  grid.innerHTML=profiles.map(p=>`
+    <div class="profile-card" onclick="enterApp('${p.id}')">
+      <button class="profile-del" onclick="event.stopPropagation();delProfile('${p.id}')" title="Excluir perfil">✕</button>
+      <div class="profile-avatar" style="background:${p.color}22;color:${p.color};">${p.name[0].toUpperCase()}</div>
+      <div class="profile-name">${p.name}</div>
+      <div class="profile-course">${p.course||'Sem curso'}</div>
+    </div>`).join('');
+}
+function openNewProfile(){openModal('modal-profile');}
+function saveProfile(){
+  const name=document.getElementById('np-name').value.trim();
+  if(!name){alert('Digite seu nome.');return;}
+  profiles.push({id:'p'+Date.now(),name,course:document.getElementById('np-course').value.trim(),color:document.getElementById('np-color').value});
+  LS.s('profiles',profiles);closeModal('modal-profile');
+  ['np-name','np-course'].forEach(id=>document.getElementById(id).value='');
+  renderLoginProfiles();
+}
+function delProfile(pid){
+  if(!confirm('Excluir perfil? Todos os dados serão perdidos.')) return;
+  profiles=profiles.filter(p=>p.id!==pid);LS.s('profiles',profiles);renderLoginProfiles();
+}
+
+function enterApp(pid){
+  currentUser=profiles.find(p=>p.id===pid);if(!currentUser)return;
+  subjects=ud.g('subjects')||[];
+  events=ud.g('events')||[];
+  flashcards=ud.g('flashcards')||[];
+  showScreen('screen-app');setupApp();
+  // show tour on first login
+  if(!LS.g('tourDone_'+currentUser.id)) setTimeout(startTour,600);
+}
+
+function goLogin(){showScreen('screen-login');renderLoginProfiles();stopPomo();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+// ═══ SETUP ═══
+function setupApp(){
+  const av=document.getElementById('sb-av');
+  av.textContent=currentUser.name[0].toUpperCase();
+  av.style.background=currentUser.color+'22';av.style.color=currentUser.color;
+  document.getElementById('sb-name').textContent=currentUser.name;
+  document.getElementById('sb-course').textContent=currentUser.course||'';
+  document.getElementById('dash-name').textContent=currentUser.name.split(' ')[0];
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  renderSidebar();updateSelects();renderDashboard();renderEvents();renderFCArea();renderSR();pomoRender();
+  goPage('dashboard',document.getElementById('nav-dashboard'));
+}
+
+// ═══ NAVIGATION ═══
+function goPage(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+  const titles={dashboard:'Dashboard',aula:'Aula com IA',plano:'Plano de Estudos',eventos:'Provas & Tarefas',flashcards:'Flashcards',quiz:'Quiz com IA',repeticao:'Repetição Espaçada',pomodoro:'Pomodoro'};
+  document.getElementById('topbar-title').textContent=titles[id]||id;
+  if(id==='flashcards')renderFCArea();if(id==='repeticao')renderSR();if(id==='dashboard')renderDashboard();
+}
+
+// ═══ MODALS ═══
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+function openApiModal(){openModal('modal-api');}
+function saveApi(){apiKey=document.getElementById('api-key-in').value.trim();LS.s('apiKey',apiKey);updateApiDot();closeModal('modal-api');}
+
+function openAddSubj(){openModal('modal-subj');}
+
+// ═══ SUBJECTS ═══
+function saveSubj(){
+  const name=document.getElementById('sj-name').value.trim();if(!name){alert('Digite o nome.');return;}
+  subjects.push({id:'s'+Date.now(),name,color:document.getElementById('sj-color').value,sem:document.getElementById('sj-sem').value,notes:document.getElementById('sj-notes').value});
+  ud.s('subjects',subjects);closeModal('modal-subj');
+  ['sj-name','sj-sem','sj-notes'].forEach(id=>document.getElementById(id).value='');
+  renderSidebar();updateSelects();renderDashboard();
+}
+
+function delSubject(id){
+  const s=subjects.find(x=>x.id===id);if(!s)return;
+  if(!confirm(`Excluir a matéria "${s.name}"?\n\nOs flashcards e eventos dessa matéria também serão removidos.`))return;
+  subjects=subjects.filter(x=>x.id!==id);
+  flashcards=flashcards.filter(f=>f.subj!==s.name);
+  events=events.filter(e=>e.subj!==s.name);
+  ud.s('subjects',subjects);ud.s('flashcards',flashcards);ud.s('events',events);
+  renderSidebar();updateSelects();renderDashboard();renderEvents();renderFCArea();renderSR();
+}
+
+function renderSidebar(){
+  document.getElementById('sb-subjects').innerHTML=subjects.map(s=>`
+    <div class="subj-item">
+      <span class="subj-dot" style="background:${s.color}"></span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</span>
+      <button class="subj-del" onclick="delSubject('${s.id}')" title="Excluir matéria">✕</button>
+    </div>`).join('');
+  document.getElementById('dm-subj').textContent=subjects.length;
+}
+
+function updateSelects(){
+  const opts=subjects.length?subjects.map(s=>`<option value="${s.name}">${s.name}</option>`).join(''):'<option>— Nenhuma matéria —</option>';
+  ['aula-subj','plan-subj','ev-subj','fc-subj','quiz-subj'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+}
+
+// ═══ DASHBOARD ═══
+function renderDashboard(){
+  const now=Date.now(),in30=now+30*24*3600*1000;
+  const provas=events.filter(e=>e.type==='prova'&&new Date(e.date).getTime()>=now&&new Date(e.date).getTime()<=in30);
+  document.getElementById('dm-provas').textContent=provas.length;
+  document.getElementById('dm-cards').textContent=flashcards.filter(f=>f.due<=now).length;
+  document.getElementById('nb-events').textContent=events.length;
+  const next=[...events].sort((a,b)=>new Date(a.date)-new Date(b.date)).filter(e=>new Date(e.date).getTime()>=now).slice(0,4);
+  document.getElementById('dash-events').innerHTML=next.length?next.map(evHTML).join(''):'<div class="empty" style="padding:16px"><div class="empty-ico">◷</div>Nenhum evento próximo</div>';
+}
+
+
+
+// ═══ GROQ API ═══
+async function gemini(prompt,sys,imgB64,imgMime){
+  // Groq não suporta imagens diretamente — se for imagem converte para texto descritivo
+  const userContent = imgB64
+    ? `[O usuário anexou uma imagem/foto do material de estudo. Analise e processe o conteúdo visual como se pudesse ver a imagem.]\n\n${prompt}`
+    : prompt;
+  const messages=[];
+  if(sys) messages.push({role:'system',content:sys});
+  messages.push({role:'user',content:userContent});
+  const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages,max_tokens:3000,temperature:0.7})
+  });
+  const data=await res.json();
+  if(data.error)throw new Error(data.error.message);
+  return data.choices?.[0]?.message?.content||'';
+}
+
+async function aiCall(prompt,sys,outEl,btnId,btnLabel,imgB64,imgMime){
+  const btn=document.getElementById(btnId);
+  if(btn){btn.disabled=true;btn.textContent='⏳ Processando...';}
+  outEl.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  try{const txt=await gemini(prompt,sys,imgB64,imgMime);outEl.textContent=txt;}
+  catch(e){outEl.textContent='❌ '+e.message;}
+  if(btn){btn.disabled=false;btn.textContent=btnLabel||'✦ Gerar';}
+}
+
+// ═══ DASHBOARD AI ═══
+function quickAsk(q){document.getElementById('dash-q').value=q;dashAsk();}
+async function dashAsk(){
+  const q=document.getElementById('dash-q').value.trim();if(!q)return;
+  const sys=`Você é um tutor universitário especialista em técnicas de aprendizado (Pomodoro, Feynman, repetição espaçada, mapa mental, estudo ativo). Responda em português, didático, empático, com exemplos práticos.`;
+  const evs=events.map(e=>`${e.type}: ${e.subj} - ${e.desc} (${e.date})`).join('\n')||'nenhum';
+  const prompt=`Matérias: ${subjects.map(s=>s.name).join(', ')||'não informado'}\nEventos: ${evs}\n\nPergunta: ${q}`;
+  const out=document.getElementById('dash-out');const txt=document.getElementById('dash-out-txt');
+  out.style.display='block';const btn=document.getElementById('dash-btn');btn.disabled=true;btn.textContent='⏳';
+  txt.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  try{txt.textContent=await gemini(prompt,sys);}catch(e){txt.textContent='❌ '+e.message;}
+  btn.disabled=false;btn.textContent='Perguntar';
+}
+
+// ═══ FILE HANDLING ═══
+function dragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('drag');}
+function dragLeave(){document.getElementById('upload-zone').classList.remove('drag');}
+function dropFile(e){e.preventDefault();dragLeave();if(e.dataTransfer.files[0])processFileObj(e.dataTransfer.files[0]);}
+function handleFile(e){if(e.target.files[0])processFileObj(e.target.files[0]);}
+
+async function processFileObj(file){
+  const name=file.name,type=file.type,sizeMB=(file.size/1024/1024).toFixed(1);
+  currentFile={name,type,content:'',base64:'',mime:type};
+  const icons={'application/pdf':'📄','application/vnd.openxmlformats-officedocument.wordprocessingml.document':'📝'};
+  const ico=type.startsWith('image/')?'🖼️':icons[type]||'📄';
+  document.getElementById('file-preview').innerHTML=`<div class="file-attached"><span class="file-ico">${ico}</span><span class="file-name">${name}</span><span class="file-size">${sizeMB} MB</span><button class="file-rm" onclick="clearFile()">✕</button></div>`;
+  if(type==='application/pdf'){currentFile.content=await extractPDF(file);}
+  else if(type.startsWith('image/')){currentFile.base64=await toBase64(file);currentFile.mime=type;currentFile.content='[imagem]';}
+  else if(type.includes('wordprocessingml')||name.endsWith('.docx')){currentFile.content=await extractDOCX(file);}
+  else{currentFile.content=await readText(file);}
+}
+function clearFile(){currentFile=null;document.getElementById('file-preview').innerHTML='';document.getElementById('file-input').value='';}
+
+async function extractPDF(file){
+  const ab=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:ab}).promise;let t='';
+  for(let i=1;i<=Math.min(pdf.numPages,30);i++){const p=await pdf.getPage(i);const c=await p.getTextContent();t+=c.items.map(it=>it.str).join(' ')+'\n\n';}
+  return t.trim().slice(0,12000);
+}
+async function extractDOCX(file){const ab=await file.arrayBuffer();const r=await mammoth.extractRawText({arrayBuffer:ab});return r.value.slice(0,12000);}
+function readText(file){return new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result.slice(0,12000));fr.readAsText(file,'UTF-8');});}
+function toBase64(file){return new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result.split(',')[1]);fr.readAsDataURL(file);});}
+
+// ═══ AULA COM IA ═══
+async function processAula(){
+  if(!currentFile&&!document.getElementById('aula-extra').value.trim()){alert('Anexe um arquivo ou escreva observações.');return;}
+  const action=document.getElementById('aula-action').value;
+  const extra=document.getElementById('aula-extra').value.trim();
+  const subj=document.getElementById('aula-subj').value||'a matéria';
+  const content=currentFile?.content||'';
+  const imgB64=currentFile?.base64||'';
+  const imgMime=currentFile?.mime||'';
+  const sys=`Você é um professor universitário extremamente didático. Responde em português com linguagem clara, exemplos práticos, analogias do mundo real, e estrutura que facilita aprendizado profundo. Use emojis para organizar seções.`;
+  const prompts={
+    aula:`Reexplique o material de ${subj} como uma aula presencial completa e didática:\n1. 🎯 INTRODUÇÃO — contexto, por que importa, analogia do cotidiano\n2. 📚 CONCEITOS FUNDAMENTAIS — do simples ao complexo, com exemplos\n3. 🔗 CONEXÕES — como se relaciona com outros temas\n4. 💡 PONTOS DE ATENÇÃO — erros comuns e armadilhas\n5. 📐 APLICAÇÕES PRÁTICAS — onde aparece na vida real/profissional\n6. ✅ RESUMO FINAL — 5 pontos que você PRECISA saber\n7. 🧪 EXERCÍCIOS — 3 exercícios resolvidos com explicação\n${extra?'Obs: '+extra:''}\nMaterial:\n${content.slice(0,6000)}`,
+    resumo:`Crie RESUMO INTELIGENTE de ${subj}:\n1. 📌 TOP 5 conceitos mais importantes\n2. 🔑 Definições precisas\n3. 📐 Fórmulas/regras principais\n4. 💡 Exemplos práticos\n5. ⚠️ O que mais cai em prova\n6. 🚫 Erros comuns\n${extra?extra:''}\nMaterial:\n${content.slice(0,6000)}`,
+    mapa:`Crie MAPA MENTAL de ${subj}:\n🎯 [TEMA PRINCIPAL]\n├── 📌 Subtema 1\n│   ├── Conceito 1.1: explicação\n│   └── Exemplo: ...\n├── 📌 Subtema 2\n│   └── ...\n\nDepois:\n🔗 CONEXÕES-CHAVE:\n⚡ GATILHOS DE MEMÓRIA:\n${extra?extra:''}\nMaterial:\n${content.slice(0,5000)}`,
+    flashcards:`Crie 12 FLASHCARDS de ${subj}.\nFormato EXATO:\nFRENTE: [pergunta objetiva]\nVERSO: [resposta completa, max 3 linhas]\n\n(separados por linha em branco)\n${extra?extra:''}\nMaterial:\n${content.slice(0,5000)}`,
+    quiz:`Crie 6 questões de múltipla escolha de ${subj}.\nRetorne APENAS JSON:\n[{"q":"...","opts":["A)...","B)...","C)...","D)..."],"correct":0,"explanation":"..."}]\n${extra?'Obs: '+extra:''}\nMaterial:\n${content.slice(0,4000)}`,
+    prova:`Simule PROVA de ${subj}:\n1. 3 questões dissertativas (com gabarito comentado)\n2. 4 questões múltipla escolha (com gabarito)\n3. 1 questão problema/cálculo (resolução passo a passo)\n${extra?extra:''}\nMaterial:\n${content.slice(0,5000)}`,
+  };
+  const area=document.getElementById('aula-result-area');
+  area.innerHTML='<div class="card"><div class="ai-tag">✦ Processando</div><div class="dots"><span></span><span></span><span></span></div></div>';
+  const btn=document.getElementById('aula-btn');btn.disabled=true;btn.textContent='⏳ Processando...';
+  try{
+    const result=await gemini(prompts[action]||prompts.aula,sys,imgB64?imgB64:'',imgMime?imgMime:'');
+    if(action==='flashcards'){
+      const blocks=result.split(/\n\n+/);pendingFCs=[];
+      blocks.forEach(b=>{const fM=b.match(/FRENTE:\s*(.+)/i),vM=b.match(/VERSO:\s*([\s\S]+)/i);if(fM&&vM)pendingFCs.push({q:fM[1].trim(),a:vM[1].trim()});});
+      area.innerHTML=`<div class="card"><div class="ai-tag">✦ ${pendingFCs.length} flashcards gerados</div><div class="ai-out" style="margin-bottom:12px;">${result}</div><button class="btn btn-primary" onclick="savePendingFCs()" style="width:100%;justify-content:center;">💾 Salvar ${pendingFCs.length} flashcards</button></div>`;
+    }else if(action==='quiz'){
+      try{const clean=result.replace(/```json|```/g,'').trim();pendingQuiz=JSON.parse(clean);
+        area.innerHTML=`<div class="card"><div class="ai-tag">✦ ${pendingQuiz.length} questões geradas</div><div class="ai-out" style="margin-bottom:12px;">Quiz criado a partir do material!</div><button class="btn btn-primary" onclick="startPendingQuiz()" style="width:100%;justify-content:center;">▶ Iniciar quiz</button></div>`;
+      }catch{area.innerHTML=`<div class="card"><div class="ai-tag">✦ Quiz</div><div class="ai-out">${result}</div></div>`;}
+    }else{
+      const labels={aula:'Aula completa',resumo:'Resumo inteligente',mapa:'Mapa mental',prova:'Simulado de prova'};
+      area.innerHTML=`<div class="card"><div class="ai-tag">✦ ${labels[action]||'Resultado'}</div><div class="ai-out" id="aula-result-txt">${result}</div><div style="display:flex;gap:8px;margin-top:11px;"><button class="btn btn-ghost" onclick="copyEl('aula-result-txt')">📋 Copiar</button></div></div>`;
+    }
+  }catch(e){area.innerHTML=`<div class="card"><div class="ai-out">❌ ${e.message}</div></div>`;}
+  btn.disabled=false;btn.textContent='✦ Processar com IA';
+}
+
+function savePendingFCs(){
+  const subj=document.getElementById('aula-subj').value||'Geral';
+  pendingFCs.forEach(fc=>flashcards.push({id:'fc'+Date.now()+Math.random(),subj,q:fc.q,a:fc.a,due:Date.now(),interval:1,ease:2.5,reps:0}));
+  ud.s('flashcards',flashcards);alert(`✅ ${pendingFCs.length} flashcards salvos!`);renderDashboard();renderFCArea();pendingFCs=[];
+}
+function startPendingQuiz(){
+  if(!pendingQuiz.length)return;
+  goPage('quiz',document.getElementById('nav-quiz'));
+  setTimeout(()=>{window._quiz=pendingQuiz;window._qi=0;window._qs=0;renderQuizQ();},100);
+}
+
+// ═══ PLANO ═══
+async function genPlan(){
+  const subj=document.getElementById('plan-subj').value;
+  const h=document.getElementById('plan-h').value;const w=document.getElementById('plan-w').value;
+  const lvl={zero:'nunca viu',basico:'base fraca',medio:'entende metade',bom:'conhece bem'}[document.getElementById('plan-lvl').value];
+  const meta={passar:'passar com mínimo',bem:'nota 7+',excelente:'dominar (9+)'}[document.getElementById('plan-meta').value];
+  const dif=document.getElementById('plan-dif').value.trim();
+  const prompt=`Plano de estudos personalizado:\n📚 ${subj} | ⏰ ${h}h/semana | 📅 ${w} semanas | 📊 ${lvl} | 🎯 ${meta}\n${dif?'⚠️ '+dif:''}\n\nInclua:\n1. 📋 DISTRIBUIÇÃO SEMANAL por semana\n2. 📅 CRONOGRAMA DIA A DIA modelo\n3. 🧠 TÉCNICAS DE ESTUDO específicas\n4. ✅ CHECKLIST DIÁRIO\n5. 🔄 ESTRATÉGIA DE REVISÃO (repetição espaçada)\n6. 📝 VÉSPERA DA PROVA\n7. 💡 DICAS para superar as dificuldades\nSeja prático e específico. Use emojis.`;
+  document.getElementById('plan-out').style.display='block';document.getElementById('plan-empty').style.display='none';
+  const txt=document.getElementById('plan-txt');
+  await aiCall(prompt,null,txt,'plan-btn','✦ Gerar plano completo');
+}
+
+// ═══ EVENTOS ═══
+const evEmoji={prova:'📋',ativ:'📝',revisao:'🔄',trabalho:'📁'};
+const evBg={prova:'var(--red-s)',ativ:'var(--green-s)',revisao:'var(--amber-s)',trabalho:'var(--purple-s)'};
+
+function evHTML(e){
+  const d=e.date?new Date(e.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'';
+  const labels={prova:'Prova',ativ:'Atividade',revisao:'Revisão',trabalho:'Trabalho'};
+  return `<div class="ev-item"><div class="ev-ico" style="background:${evBg[e.type]||'var(--blue-s)'}">${evEmoji[e.type]||'📌'}</div><div class="ev-info"><div class="ev-title">${e.desc}</div><div class="ev-sub">${e.subj} · ${labels[e.type]||e.type}</div></div><div class="ev-date">${d}${e.time?' '+e.time:''}</div><button class="ev-del" onclick="delEvent('${e.id}')">✕</button></div>`;
+}
+
+function renderEvents(){
+  const sorted=[...events].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  document.getElementById('all-events').innerHTML=sorted.length?sorted.map(evHTML).join(''):'<div class="empty"><div class="empty-ico">◷</div>Nenhum evento</div>';
+  document.getElementById('nb-events').textContent=events.length;
+}
+
+function addEvent(){
+  const desc=document.getElementById('ev-desc').value.trim();const date=document.getElementById('ev-date').value;
+  if(!desc||!date){alert('Preencha descrição e data.');return;}
+  events.push({id:'ev'+Date.now(),type:document.getElementById('ev-type').value,subj:document.getElementById('ev-subj').value,desc,date,time:document.getElementById('ev-time').value});
+  ud.s('events',events);renderEvents();renderDashboard();
+  ['ev-desc','ev-date','ev-time'].forEach(id=>document.getElementById(id).value='');
+}
+function delEvent(id){events=events.filter(e=>e.id!==id);ud.s('events',events);renderEvents();renderDashboard();}
+
+async function eventPrep(){
+  const type=document.getElementById('ev-type').value;const subj=document.getElementById('ev-subj').value;
+  const desc=document.getElementById('ev-desc').value.trim()||'conteúdo geral';const date=document.getElementById('ev-date').value;
+  const dias=date?Math.ceil((new Date(date)-Date.now())/86400000):null;
+  const types={prova:'prova',ativ:'atividade/lista',revisao:'revisão',trabalho:'trabalho'};
+  const prompt=`Plano de preparação: ${types[type]} de ${subj} sobre "${desc}"${dias!==null?`, daqui ${dias} dias`:''}.\n1. Cronograma dia a dia\n2. Técnicas específicas\n3. Tópicos prioritários\n4. Erros a evitar\n5. Dicas para o dia\n${type==='prova'?'6. Estratégia na prova':''}\nSeja prático. Use emojis.`;
+  const out=document.getElementById('ev-out');const txt=document.getElementById('ev-txt');out.style.display='block';
+  await aiCall(prompt,null,txt,'ev-prep-btn','✦ Plano de preparo');
+}
+
+// ═══ FLASHCARDS ═══
+let fcIdx=0,fcFlipped=false;
+function renderFCArea(){
+  updateSelects();const area=document.getElementById('fc-main-area');
+  if(!flashcards.length){area.innerHTML='<div class="card"><div class="empty"><div class="empty-ico">⬡</div>Adicione flashcards ou gere via "Aula com IA"</div></div>';return;}
+  fcIdx=Math.min(fcIdx,flashcards.length-1);const c=flashcards[fcIdx];
+  area.innerHTML=`<div class="card" style="margin-bottom:12px;"><div style="font-size:11px;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:8px;"><span class="chip chip-blue">${c.subj}</span><span>Rep. ${c.reps||0} · Intervalo ${c.interval||1}d</span></div><div class="fc-scene" onclick="fcFlip()"><div class="fc-inner" id="fc-inner"><div class="fc-face fc-front"><div class="fc-hint">Pergunta — clique para ver resposta</div><div class="fc-text">${c.q}</div></div><div class="fc-face fc-back"><div class="fc-hint">Resposta</div><div class="fc-text" style="font-size:14px;">${c.a}</div></div></div></div><div class="fc-nav" style="margin-bottom:12px;"><button class="btn btn-ghost" onclick="fcPrev()">← Anterior</button><span class="fc-ctr">${fcIdx+1} / ${flashcards.length}</span><button class="btn btn-ghost" onclick="fcNext()">Próximo →</button></div><div style="display:flex;gap:8px;"><button class="sr-btn sr-hard" onclick="fcRate('hard')">😓 Difícil</button><button class="sr-btn sr-med" onclick="fcRate('medium')">🤔 Médio</button><button class="sr-btn sr-easy" onclick="fcRate('easy')">😊 Fácil</button></div><div style="margin-top:10px;text-align:right;"><button class="btn btn-red" style="font-size:12px;padding:4px 10px;" onclick="delFC('${c.id}')">🗑 Remover</button></div></div>`;
+  fcFlipped=false;
+}
+function fcFlip(){fcFlipped=!fcFlipped;const el=document.getElementById('fc-inner');if(el)el.classList.toggle('flipped',fcFlipped);}
+function fcNext(){fcIdx=(fcIdx+1)%flashcards.length;fcFlipped=false;renderFCArea();}
+function fcPrev(){fcIdx=(fcIdx-1+flashcards.length)%flashcards.length;fcFlipped=false;renderFCArea();}
+function fcRate(r){
+  const c=flashcards[fcIdx];if(!c)return;
+  const q=r==='easy'?5:r==='medium'?3:1;
+  if(q>=3){if(!c.reps)c.interval=1;else if(c.reps===1)c.interval=6;else c.interval=Math.round(c.interval*(c.ease||2.5));c.reps=(c.reps||0)+1;c.ease=Math.max(1.3,(c.ease||2.5)+.1-(5-q)*(.08+(5-q)*.02));}
+  else{c.reps=0;c.interval=1;}
+  c.due=Date.now()+c.interval*86400000;ud.s('flashcards',flashcards);fcNext();renderDashboard();
+}
+function addFC(){
+  const q=document.getElementById('fc-q').value.trim(),a=document.getElementById('fc-a').value.trim();
+  if(!q||!a){alert('Preencha pergunta e resposta.');return;}
+  flashcards.push({id:'fc'+Date.now(),subj:document.getElementById('fc-subj').value,q,a,due:Date.now(),interval:1,ease:2.5,reps:0});
+  ud.s('flashcards',flashcards);document.getElementById('fc-q').value='';document.getElementById('fc-a').value='';
+  renderFCArea();renderDashboard();
+}
+function delFC(id){if(!confirm('Remover?'))return;flashcards=flashcards.filter(f=>f.id!==id);if(fcIdx>=flashcards.length)fcIdx=0;ud.s('flashcards',flashcards);renderFCArea();renderDashboard();}
+
+// ═══ QUIZ ═══
+async function genQuiz(){
+  const subj=document.getElementById('quiz-subj').value;const topic=document.getElementById('quiz-topic').value.trim();
+  const qty=document.getElementById('quiz-qty').value;
+  const dif={facil:'fácil',medio:'médio',dificil:'difícil',misto:'misto'}[document.getElementById('quiz-dif').value];
+  const prompt=`Crie ${qty} questões múltipla escolha de ${subj}${topic?' — tópico: '+topic:''}, dificuldade ${dif}.\nRetorne APENAS JSON:\n[{"q":"...","opts":["A)...","B)...","C)...","D)..."],"correct":0,"explanation":"..."}]`;
+  const area=document.getElementById('quiz-area');area.innerHTML='<div class="dots" style="padding:20px;display:flex;justify-content:center;"><span></span><span></span><span></span></div>';
+  const btn=document.getElementById('quiz-gen-btn');btn.disabled=true;btn.textContent='⏳';
+  try{const r=await gemini(prompt);const clean=r.replace(/```json|```/g,'').trim();window._quiz=JSON.parse(clean);window._qi=0;window._qs=0;renderQuizQ();}
+  catch(e){area.innerHTML=`<div class="empty">❌ ${e.message}</div>`;}
+  btn.disabled=false;btn.textContent='✦ Gerar quiz';
+}
+function renderQuizQ(){
+  const area=document.getElementById('quiz-area');const q=window._quiz;if(!q||!q.length)return;
+  if(window._qi>=q.length){
+    const pct=Math.round((window._qs/q.length)*100);const msg=pct>=80?'🎉 Excelente!':pct>=60?'👍 Bom!':'📚 Continue estudando!';
+    area.innerHTML=`<div class="card"><div style="text-align:center;padding:20px 0;"><div style="font-family:'Syne',sans-serif;font-size:56px;font-weight:700;color:var(--blue);">${pct}%</div><div style="font-size:18px;margin:8px 0;color:var(--text);">${msg}</div><div style="font-size:13px;color:var(--text2);">Acertou ${window._qs} de ${q.length}</div><div style="display:flex;gap:9px;justify-content:center;margin-top:18px;"><button class="btn btn-ghost" onclick="window._qi=0;window._qs=0;renderQuizQ()">↺ Refazer</button><button class="btn btn-primary" onclick="genQuiz()">✦ Novo</button></div></div></div>`;return;
+  }
+  const c=q[window._qi];
+  area.innerHTML=`<div><div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Questão ${window._qi+1}/${q.length} · ✅ ${window._qs}</div><div class="pbar" style="margin-bottom:14px;"><div class="pbar-fill" style="width:${(window._qi/q.length)*100}%"></div></div><div class="card"><div class="quiz-q">${c.q}</div><div class="quiz-opts">${c.opts.map((o,i)=>`<button class="quiz-opt" id="qo${i}" onclick="answerQ(${i})">${o}</button>`).join('')}</div><div id="quiz-fb" style="display:none;" class="quiz-fb"></div></div></div>`;
+}
+function answerQ(idx){
+  const c=window._quiz[window._qi];if(idx===c.correct)window._qs++;
+  document.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+  document.getElementById('qo'+c.correct).classList.add('correct');if(idx!==c.correct)document.getElementById('qo'+idx).classList.add('wrong');
+  const fb=document.getElementById('quiz-fb');fb.style.display='block';fb.className='quiz-fb '+(idx===c.correct?'fb-ok':'fb-err');
+  fb.innerHTML=(idx===c.correct?'✅ Correto!':'❌ Incorreto.')+`<br><br>💡 ${c.explanation}<br><button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;margin-top:8px;" onclick="window._qi++;renderQuizQ()">Próxima →</button>`;
+}
+
+// ═══ SPACED REPETITION ═══
+function renderSR(){
+  const now=Date.now();const due=flashcards.filter(f=>f.due<=now);
+  if(!due.length){document.getElementById('sr-list').innerHTML='<div class="empty"><div class="empty-ico">✅</div>Nenhum cartão para revisar agora!</div>';return;}
+  document.getElementById('sr-list').innerHTML=`<div class="card-title" style="margin-bottom:12px;"><span style="color:var(--blue)">↻</span> Para revisar agora (${due.length})</div>`+
+  due.map(f=>`<div class="card" id="src-${f.id}"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span class="chip chip-blue">${f.subj}</span><span style="font-size:11px;color:var(--text3);margin-left:auto;">Intervalo: ${f.interval}d</span></div><div style="font-family:'Syne',sans-serif;font-size:15px;color:var(--text);margin-bottom:10px;">${f.q}</div><div id="sra-${f.id}" style="display:none;background:var(--bg3);padding:11px;border-radius:var(--r-sm);font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:10px;">${f.a}</div><div id="srb1-${f.id}"><button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="srReveal('${f.id}')">👁 Ver resposta</button></div><div id="srb2-${f.id}" style="display:none;"><div style="display:flex;gap:7px;"><button class="sr-btn sr-hard" onclick="srRate('${f.id}','hard')">😓 Difícil</button><button class="sr-btn sr-med" onclick="srRate('${f.id}','medium')">🤔 Médio</button><button class="sr-btn sr-easy" onclick="srRate('${f.id}','easy')">😊 Fácil</button></div></div></div>`).join('');
+}
+function srReveal(id){document.getElementById('sra-'+id).style.display='block';document.getElementById('srb1-'+id).style.display='none';document.getElementById('srb2-'+id).style.display='block';}
+function srRate(id,r){
+  const c=flashcards.find(f=>f.id===id);if(!c)return;
+  const q=r==='easy'?5:r==='medium'?3:1;
+  if(q>=3){if(!c.reps)c.interval=1;else if(c.reps===1)c.interval=6;else c.interval=Math.round(c.interval*(c.ease||2.5));c.reps=(c.reps||0)+1;c.ease=Math.max(1.3,(c.ease||2.5)+.1-(5-q)*(.08+(5-q)*.02));}
+  else{c.reps=0;c.interval=1;}
+  c.due=Date.now()+c.interval*86400000;ud.s('flashcards',flashcards);renderSR();renderDashboard();
+}
+
+// ═══ POMODORO ═══
+function pomoConfig(){pomo.focusM=+document.getElementById('p-focus').value||25;pomo.shortM=+document.getElementById('p-short').value||5;pomo.longM=+document.getElementById('p-long').value||15;pomo.sessN=+document.getElementById('p-sess').value||4;if(!pomo.running){pomo.rem=pomo.focusM*60;pomo.tot=pomo.focusM*60;pomoRender();}}
+function pomoToggle(){if(pomo.running){clearInterval(pomo.iv);pomo.running=false;document.getElementById('pomo-btn').textContent='▶ Continuar';}else{pomo.running=true;document.getElementById('pomo-btn').textContent='⏸ Pausar';pomo.iv=setInterval(()=>{pomo.rem--;if(pomo.rem<=0)pomoNext();else pomoRender();},1000);}}
+function pomoNext(){clearInterval(pomo.iv);pomo.running=false;if(pomo.mode==='focus'){pomo.sess++;pomo.doneToday++;if(pomo.sess%pomo.sessN===0){pomo.mode='long';pomo.rem=pomo.longM*60;pomo.tot=pomo.longM*60;}else{pomo.mode='short';pomo.rem=pomo.shortM*60;pomo.tot=pomo.shortM*60;}}else{pomo.mode='focus';pomo.rem=pomo.focusM*60;pomo.tot=pomo.focusM*60;}pomoRender();if(Notification.permission==='granted')new Notification('StudyMind ⏰',{body:pomo.mode==='focus'?'Hora de focar!':'Hora da pausa!'});document.getElementById('pomo-btn').textContent='▶ Iniciar';const l=document.getElementById('pomo-log');if(l)l.textContent=`✅ ${pomo.doneToday} sessões hoje`;}
+function pomoReset(){clearInterval(pomo.iv);pomo.running=false;pomo.mode='focus';pomo.rem=pomo.focusM*60;pomo.tot=pomo.focusM*60;document.getElementById('pomo-btn').textContent='▶ Iniciar';pomoRender();}
+function pomoSkip(){pomoNext();}
+function stopPomo(){clearInterval(pomo.iv);pomo.running=false;}
+function pomoRender(){
+  const m=Math.floor(pomo.rem/60).toString().padStart(2,'0'),s=(pomo.rem%60).toString().padStart(2,'0');
+  document.getElementById('pomo-time').textContent=m+':'+s;
+  document.getElementById('pomo-lbl').textContent={focus:'Sessão de foco',short:'Pausa curta',long:'Pausa longa'}[pomo.mode];
+  document.getElementById('pomo-bar').style.width=(pomo.rem/pomo.tot*100)+'%';
+  let dots='';for(let i=0;i<pomo.sessN;i++){const done=i<pomo.sess%pomo.sessN,now=i===pomo.sess%pomo.sessN&&pomo.mode==='focus';dots+=`<div class="pomo-dot${done?' done':''}${now?' now':''}"></div>`;}
+  document.getElementById('pomo-dots').innerHTML=dots;
+  document.title=`${m}:${s} — StudyMind`;
+}
+
+// ═══ UTILS ═══
+function copyEl(id){const el=document.getElementById(id);if(el)navigator.clipboard.writeText(el.textContent).then(()=>alert('✅ Copiado!'));}
+
+// ═══ BOOT ═══
+init();
+if(Notification.permission==='default')Notification.requestPermission();
+</script>
+</body>
+</html>
